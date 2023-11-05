@@ -24,26 +24,75 @@ void RCC_InitClk(void)
 	switch(x)
 	{
 		case RCC_HSE_CRYSTAL: 
-				RCC_CR	=0x00010000;		/*		Enable HSE with no bypass		*/		
 				RCC_CFGR=0x00000001;
-				break;
-		case RCC_HSE_RC:
-				RCC_CR	=0x00050000;		/*		Enable HSE with bypass		*/
-				RCC_CFGR=0x00000001;
+				RCC_CR	=0x00010000;		/*		Enable HSE with no bypass		*/
+				while(((READ_BIT(RCC_CR , 17)) == 0) && (TimeOut < 100000))
+				{
+					TimeOut++;
+				}
+				if( TimeOut >= 100000 )
+				{
+					TimeOut=0;
+					/* we will indicate that it is passed due to time out action */
 
+				}
 				break;
+
+		case RCC_HSE_RC:
+			CLR_BIT(RCC_CR, 16);
+
+			/* BIT 18 -> To Select HSE BYPASS */
+			/* HSEBYPASS Clock Enable */
+			SET_BIT(RCC_CR, 18);
+
+			/* BIT 1:0 -> Choose Between HSI OR HSE OR PLL */
+			/* HSE Selected As A System Clock */
+			SET_BIT(RCC_CFGR, 0);
+			CLR_BIT(RCC_CFGR, 1);
+
+			/* Bit 16 -> Enable The HSE Clock */
+			SET_BIT(RCC_CR, 16);
+
+			/* Bit 17 -> Checking While The HSE Clock Is Stable */
+				while(((READ_BIT(RCC_CR , 17)) == 0) && (TimeOut < 100000))
+				{
+					TimeOut++;
+				}
+				if( TimeOut >= 100000 )
+				{
+					TimeOut=0;
+
+					/* we will indicate that it is passed due to time out action */
+
+				}
+				break;
+
 		case RCC_HSI:
-				RCC_CR	=0x00000081;		/*		Enable HSI	+ Trimming = 0	*/
 				RCC_CFGR=0x00000000;
+				RCC_CR	=0x00000001;		/*		Enable HSI	+ Trimming = 0	*/
+
+				while(((READ_BIT(RCC_CR , 1)) == 0) && (TimeOut < 100000))
+				{
+					TimeOut++;
+				}
+				if( TimeOut >= 100000 )
+				{
+					TimeOut=0;
+
+					/* we will indicate that it is passed due to time out action */
+
+				}
 				break;
 				
 		case RCC_PLL:
-		
+			CLR_BIT(RCC_CFGR,0);
+			SET_BIT(RCC_CFGR,1);
+			RCC_CFGR&=(~((0b1111)<<18));
+			RCC_CFGR|=(z<<18);
 				switch(y)
 				{
 					case RCC_PLL_IN_HSI_DIV2:
 						CLR_BIT(RCC_CFGR,16);
-						CLR_BIT(RCC_CFGR,17);
 						break;
 
 					case RCC_PLL_IN_HSE_DIV2:
@@ -58,26 +107,23 @@ void RCC_InitClk(void)
 						CLR_BIT(RCC_CFGR,17);
 						break;
 				}
-				RCC_CFGR&=~((0b1111)<<18);
-				RCC_CFGR|=(z<<18);
-				while(((READ_BIT(RCC_CR , 17)) == 0) && (TimeOut < 100000))
+
+				SET_BIT(RCC_CR,24);				/* PLL Clock Enable */
+				while(((READ_BIT(RCC_CR , 25)) == 0) && (TimeOut < 100000))
 				{
 					TimeOut++;
 				}
 				if( TimeOut >= 100000 )
 				{
+					TimeOut=0;
 
 					/* we will indicate that it is passed due to time out action */
 
 				}
-				SET_BIT(RCC_CR,24);				/* PLL Clock Enable */
 				break;
-		
-		default: #error " Wrong Clock System Type Configuration "
-		break;
 	}
-}
 
+}
 void RCC_Enable_Clk(u8 BusId, u8 PerId)
 {
 		if(PerId <=	31)

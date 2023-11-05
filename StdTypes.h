@@ -2,6 +2,7 @@
 /*		Author	: Pola Magdy			   */
 /*		Version	: V01					   */
 /*		Date	: 1/11/2023				   */
+/*     Description: StdTypes.h 		       */
 /*******************************************/
 
 #ifndef STDTYPES_H_
