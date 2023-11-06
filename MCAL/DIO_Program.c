@@ -9,11 +9,19 @@
 #include "DIO_Interface.h"
 #include "DIO_Private.h"
 #include "Utils.h"
+#include "RCC_Interface.h"
+#include "RCC_Private.h"
+#include "RCC_Cfg.h"
+
+
+
+/********** Find it on DIO_Services.c **********/
 
 static void DIO_InitPin(DIO_Pin_type pin,DIO_PinStatus_type status)
 {
 		if(pin<PINB0)
 		{
+			RCC_Enable_Clk(RCC_APB2,DIOA);
 			if(pin<= PINA7)
 			{
 				DIOA_CRL&=~((0b1111)<<( pin * 4));
@@ -28,6 +36,8 @@ static void DIO_InitPin(DIO_Pin_type pin,DIO_PinStatus_type status)
 		}
 		else if(pin<PINC0)
 		{
+			RCC_Enable_Clk(RCC_APB2,DIOB);
+
 			if(pin<= PINB7)			//PINB0=16		PINB7=24
 			{
 				DIOB_CRL&=~((0b1111)<<( (pin-PINB0) * 4));
@@ -42,6 +52,8 @@ static void DIO_InitPin(DIO_Pin_type pin,DIO_PinStatus_type status)
 		}
 		else if(pin<TOTAL_PINS)
 		{
+			RCC_Enable_Clk(RCC_APB2,DIOC);
+
 			if(pin<= PINC7)			//PINB0=16		PINB7=24
 			{
 				DIOC_CRL&=~((0b1111)<<( (pin-PINC0) * 4));
@@ -66,11 +78,11 @@ void DIO_WritePin(DIO_Pin_type pin, DIO_PinVoltage_type volt)
 		}
 		else if(pin<=PINB15)
 		{
-			SET_BIT(DIOB_ODR, pin);
+			SET_BIT(DIOB_ODR, (pin-PINB0));
 		}
 		else if(pin<=PINC15)
 		{
-			SET_BIT(DIOC_ODR, pin);
+			SET_BIT(DIOC_ODR, (pin-PINC0));
 		}
 	}
 	else
@@ -81,11 +93,11 @@ void DIO_WritePin(DIO_Pin_type pin, DIO_PinVoltage_type volt)
 		}
 		else if(pin<=PINB15)
 		{
-			CLR_BIT(DIOB_ODR, pin);
+			CLR_BIT(DIOB_ODR, (pin-PINB0));
 		}
 		else if(pin<=PINC15)
 		{
-			CLR_BIT(DIOC_ODR, pin);
+			CLR_BIT(DIOC_ODR, (pin-PINC0));
 		}
 	}
 }
@@ -109,6 +121,7 @@ DIO_PinVoltage_type DIO_ReadPin(DIO_Pin_type pin)
 	return volt;
 }
 
+/********** Find it on DIO_Services.c **********/
 
 void DIO_Init(void)
 {

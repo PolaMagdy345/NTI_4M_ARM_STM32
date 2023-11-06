@@ -11,7 +11,7 @@
 
 #include "RCC_Private.h"
 
-#define RCC_CLOCK_TYPE			RCC_PLL
+#define RCC_CLOCK_TYPE			RCC_HSE_CRYSTAL
 
 #define	PLL_INPUT_SELECTION		RCC_PLL_IN_HSI_DIV2
 

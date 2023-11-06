@@ -9,6 +9,13 @@
 #ifndef _DIO_INTERFACE_H
 #define _DIO_INTERFACE_H
 
+typedef enum{
+
+	DIOA=2,
+	DIOB,
+	DIOC
+}Buses_Name_t;
+
 typedef enum
 {
 
@@ -100,6 +107,8 @@ typedef enum{
 	LOW,
 	HIGH
 }DIO_PinVoltage_type;
+
+
 
 void DIO_WritePin(DIO_Pin_type pin, DIO_PinVoltage_type volt);
 
